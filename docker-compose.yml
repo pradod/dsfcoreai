@@ -13,8 +13,16 @@ x-app: &app
     - ./artifacts:/app/artifacts
 
 services:
+  # Baixa e prepara os dados públicos (idempotente). Na primeira vez leva ~40 min.
+  data-prep:
+    <<: *app
+    command: ["python", "-m", "consig_risk.data"]
+
   api:
     <<: *app
+    depends_on:
+      data-prep:
+        condition: service_completed_successfully
     command: ["uvicorn", "consig_risk.api.main:create_app", "--factory", "--host", "0.0.0.0", "--port", "8000"]
     ports:
       - "8000:8000"
