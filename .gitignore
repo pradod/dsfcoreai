@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+build/
+dist/
+
+# Ferramentas
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+.ipynb_checkpoints/
+
+# Segredos
+.env
+
+# Dados e modelos: são gerados pelo pipeline, nunca versionados
+data/*
+!data/.gitkeep
+artifacts/*
+!artifacts/.gitkeep
+
+# Enunciado do case (material do processo seletivo, não é parte da solução)
+case_core_ai_hiring_ai_engineer.pdf
+
+# SO / editores
+.DS_Store
+.idea/
+.vscode/
