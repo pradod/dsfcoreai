@@ -13,7 +13,7 @@ x-app: &app
     - ./artifacts:/app/artifacts
 
 services:
-  # Baixa e prepara os dados públicos (idempotente). Na primeira vez leva ~40 min.
+  # Baixa e prepara os dados públicos (idempotente). Na primeira vez leva ~45 min.
   data-prep:
     <<: *app
     command: ["python", "-m", "consig_risk.data"]

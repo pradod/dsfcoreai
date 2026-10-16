@@ -19,6 +19,8 @@ htmlcov/
 .env
 
 # Dados e modelos: são gerados pelo pipeline, nunca versionados
+# (.tmp/ é onde o DuckDB despeja dados temporários em consultas grandes)
+.tmp/
 data/*
 !data/.gitkeep
 artifacts/*

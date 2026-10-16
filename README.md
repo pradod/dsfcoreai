@@ -23,7 +23,7 @@ O `docker compose up` roda as etapas em ordem; cada uma só começa quando a ant
 
 | Etapa | Serviço | O que faz | Tempo na primeira vez |
 |---|---|---|---|
-| 1 | `data-prep` | Baixa ~15 GB de dados públicos (2 fotos da Receita, regimes tributários e 2 trimestres da PGFN) e converte para Parquet | ~40 min (≈32 min de download a ~5 MB/s e ~6 min de conversão) |
+| 1 | `data-prep` | Baixa ~15 GB de dados públicos (2 fotos da Receita, regimes tributários e 2 trimestres da PGFN), converte para Parquet e gera a coorte de treino e a tabela de empresas | ~45 min (≈32 min de download a ~5 MB/s) |
 | 2 | `api` e `ui` | Sobem a API e a interface | segundos |
 
 _(a preencher: treino do modelo)_
@@ -52,10 +52,11 @@ make check     # lint + type check + testes (o mesmo que o CI)
 src/consig_risk/
   config.py      configuração via variáveis de ambiente
   data/          download das fontes públicas e conversão para Parquet
+  features/      features por empresa numa data de referência e coorte de treino
   api/           API HTTP (FastAPI) — porta de entrada do agent
   ui/            interface Streamlit (sem regra de negócio)
 tests/           testes automatizados
-notebooks/       análise exploratória e avaliação (resultados visíveis)
+notebooks/       análise exploratória e avaliação, executados (resultados visíveis no GitHub)
 docs/adr/        registro das decisões de arquitetura
 docker/          imagem única usada por todos os serviços
 data/            dados baixados/processados (não versionado)

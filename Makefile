@@ -1,4 +1,4 @@
-.PHONY: install lint format typecheck test check up down
+.PHONY: install lint format typecheck test check up down data notebooks
 
 install:  ## Instala dependências e hooks de pre-commit
 	uv sync
@@ -25,3 +25,10 @@ up:
 
 down:
 	docker compose down
+
+data:  ## Baixa e prepara os dados (idempotente; ~45 min na primeira vez)
+	uv run python -m consig_risk.data
+
+notebooks:  ## Reexecuta os notebooks, gravando os resultados neles
+	uv run --group notebooks jupyter nbconvert --to notebook --execute --inplace \
+		--ExecutePreprocessor.timeout=1800 notebooks/*.ipynb
