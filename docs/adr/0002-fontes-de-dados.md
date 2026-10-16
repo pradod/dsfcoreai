@@ -43,7 +43,6 @@ Uma fonte só ajuda o modelo de sobrevivência se passar em quatro testes:
 | **Receita CNPJ**: Empresas, Estabelecimentos, Simples, Sócios e tabelas de domínio | Núcleo: define o evento, a duração e a maior parte das features | Duas fotos (abaixo) |
 | **Regimes Tributários (ECF)**: Lucro Real, Presumido, Arbitrado e Imunes/Isentas | Feature de porte e formalidade contábil | Cada linha tem o ano da escrituração (2016–2024); só se usa o ano anterior à foto de origem |
 | **PGFN, Dívida Ativa da União**: FGTS, Previdenciário e Não Previdenciário | Sinal de dificuldade financeira. Dívida de FGTS indica empregador que não deposita o FGTS dos funcionários | Fotos trimestrais desde 2020 e `DATA_INSCRICAO` por inscrição |
-| **IBGE, Demografia das Empresas** | **Validação externa**, não feature: comparar nossas curvas com as taxas oficiais de sobrevivência das empresas com assalariados | Não se aplica |
 
 ### Desenho temporal: duas fotos
 
@@ -72,6 +71,13 @@ jurídica, matriz) serão definidos e justificados na EDA.
   Ficam como possível segundo componente de risco, fora deste modelo.
 - **SCR.data (Banco Central):** inadimplência agregada por segmento. Mede outro evento e é
   redundante com o CNAE.
+- **IBGE, Demografia das Empresas:** foi planejada como validação externa (comparar nossas curvas
+  com as taxas oficiais de sobrevivência). Ficou de fora porque as duas medidas não são
+  comparáveis: o IBGE define empresa ativa e sobrevivência pelos seus próprios critérios de
+  atividade (o cadastro CEMPRE, ano a ano), e não pela situação cadastral na Receita; e as tabelas
+  por porte e setor só existem em PDF. A comparação daria só ordem de grandeza (o IBGE publica
+  sobrevivência anual em torno de 84% em 2017–2018), sem valor como validação. A validação do modelo
+  ficou com o conjunto de teste fora da amostra (ADR-0003).
 - **CEIS/CNEP (Portal da Transparência):** tem CNPJ, mas os casos são raríssimos e concentrados em
   fornecedores do governo. Acrescentaria complexidade sem efeito mensurável.
 

@@ -41,7 +41,9 @@ determinístico (`deterministic`, `force_row_wise`, semente e número de threads
 execuções na mesma plataforma geram o mesmo arquivo de modelo, byte a byte. Entre plataformas
 (macOS ARM e o contêiner Linux do `docker compose`), o arquivo difere apenas na formatação textual
 de alguns números, e as previsões são idênticas (diferença máxima de 0,0 em S(t) para 95 mil
-empresas).
+empresas). O dado de treino também é reproduzível: as somas monetárias são feitas em decimal
+exato (em ponto flutuante, o resultado dependeria da ordem da soma, que muda com o paralelismo), e
+a coorte é ordenada por CNPJ antes do treino.
 
 ## Resultados
 

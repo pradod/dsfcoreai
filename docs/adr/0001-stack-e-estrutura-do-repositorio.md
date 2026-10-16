@@ -36,5 +36,9 @@ clonar o repositório deve conseguir treinar de novo e obter o mesmo modelo usad
 
 - A imagem única carrega dependências que alguns serviços não usam (ex.: a UI carrega bibliotecas de
   modelagem). Aceitável aqui; em produção, dividiríamos em imagens por serviço.
-- Uma API sem estado exige um session store externo quando houver mais de uma réplica. Ver o ADR
-  sobre escala (a escrever).
+- Uma API sem estado exige um session store externo quando houver mais de uma réplica: hoje o ADK
+  guarda as sessões em SQLite, e a troca para Postgres é só de URL. Ver o
+  [ADR-0005](0005-caminho-para-escala.md).
+- O contêiner roda sem usuário fixo porque `data/` e `artifacts/` são pastas do host montadas
+  nele: um UID fixo não conseguiria escrever nelas num Linux cujo usuário tem outro UID. Uma
+  imagem de produção, sem volumes do host, rodaria com usuário sem privilégios.
