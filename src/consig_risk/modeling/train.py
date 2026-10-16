@@ -119,6 +119,11 @@ def main(argv: list[str] | None = None) -> None:
     settings = get_settings()
     cohort_path = settings.data_dir / "processed" / "cohort.parquet"
     model_dir = settings.artifacts_dir / "model"
+    if not cohort_path.exists():
+        raise SystemExit(
+            f"{cohort_path} não existe: rode o preparo de dados antes "
+            "(`python -m consig_risk.data` ou o serviço data-prep do docker compose)"
+        )
     if not args.force and is_up_to_date(cohort_path, model_dir):
         logger.info(
             "modelo já treinado com esta coorte em %s; use --force para treinar de novo", model_dir

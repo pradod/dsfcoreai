@@ -127,7 +127,9 @@ def company_features_sql(paths: SnapshotPaths) -> str:
              bool_or(origem = 'previdenciario') AS divida_previdenciaria,
              bool_or(origem = 'nao_previdenciario') AS divida_nao_previdenciaria,
              count(*) AS n_inscricoes,
-             sum(valor_consolidado) AS valor_divida,
+             -- Soma em decimal exato: em ponto flutuante o resultado depende da ordem da soma, que
+             -- muda com o paralelismo, e o dado de treino deixaria de ser reproduzível.
+             CAST(sum(CAST(valor_consolidado AS DECIMAL(18, 2))) AS DOUBLE) AS valor_divida,
              bool_or(ajuizado) AS divida_ajuizada,
              max(data_inscricao) AS ultima_inscricao
       FROM read_parquet('{paths.pgfn_dir}/*.parquet')

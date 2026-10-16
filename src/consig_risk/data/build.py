@@ -17,8 +17,7 @@ import zipfile
 from pathlib import Path
 from typing import IO
 
-import duckdb
-
+from consig_risk import duck
 from consig_risk.config import get_settings
 from consig_risk.data import sources
 from consig_risk.data.layout import TABLES, TableSpec
@@ -67,7 +66,7 @@ def convert_zip(zip_path: Path, spec: TableSpec, dest: Path, tmp_dir: Path) -> P
     partial.unlink(missing_ok=True)
     try:
         columns = ", ".join(f"'{c}': 'VARCHAR'" for c in spec.raw_columns)
-        duckdb.sql(
+        duck.connect().execute(
             f"""
             COPY (
               SELECT

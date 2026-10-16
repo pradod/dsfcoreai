@@ -228,6 +228,7 @@ def test_company_features_use_only_information_available_at_reference_date(
     assert a1["regime_tributario"] == "simples"  # ECF 2022 ignorada
     assert a1["divida_fgts"] is False  # dívida como corresponsável não conta
     assert a2["divida_fgts"] is True and a2["meses_desde_ultima_inscricao"] == 6
+    assert a2["valor_divida"] == 1500.0
     assert a2["excluido_simples_12m"] is True
     assert a2["idade_meses"] == 24
     assert a2["regime_tributario"] == "sem_ecf"

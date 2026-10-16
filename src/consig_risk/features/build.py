@@ -18,6 +18,7 @@ from pathlib import Path
 
 import duckdb
 
+from consig_risk import duck
 from consig_risk.config import get_settings
 from consig_risk.data import sources
 from consig_risk.features.cohort import cohort_sql, reference_date
@@ -37,7 +38,7 @@ def _copy(con: duckdb.DuckDBPyConnection, query: str, dest: Path) -> None:
 
 
 def build(interim_dir: Path, processed_dir: Path, force: bool = False) -> None:
-    con = duckdb.connect()
+    con = duck.connect()
     origin_dir = interim_dir / "receita" / sources.ORIGIN.receita_month
     latest_dir = interim_dir / "receita" / sources.LATEST.receita_month
     origin = SnapshotPaths.for_snapshot(
@@ -56,8 +57,12 @@ def build(interim_dir: Path, processed_dir: Path, force: bool = False) -> None:
     cohort_path = processed_dir / "cohort.parquet"
     if force or not cohort_path.exists():
         _copy(con, cohort_sql(origin, latest_dir, latest.ref_date), cohort_path)
+    else:
+        logger.info("já existe, mantido: %s", cohort_path)
     companies_path = processed_dir / "companies.parquet"
-    if force or not companies_path.exists():
+    if not force and companies_path.exists():
+        logger.info("já existe, mantido: %s", companies_path)
+    else:
         # Descrições da natureza jurídica e da atividade, para o relatório ser legível.
         _copy(
             con,

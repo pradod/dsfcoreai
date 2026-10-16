@@ -21,6 +21,9 @@ class Settings(BaseSettings):
     # Onde o ADK guarda as conversas. SQLite basta para uma instância; para várias réplicas da
     # API, aponte para um Postgres (ex.: postgresql+asyncpg://...).
     session_db_url: str = "sqlite+aiosqlite:///data/sessions.db"
+    # Teto de memória do DuckDB no preparo dos dados. Acima disso ele usa disco (mais lento, mas
+    # não estoura a memória do Docker, que no Docker Desktop costuma ser 8 GB para tudo).
+    duckdb_memory_limit: str = "4GB"
 
 
 class LLMSettings(BaseSettings):

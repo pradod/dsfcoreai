@@ -27,7 +27,7 @@ COPY src ./src
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --locked --no-dev
 
-RUN useradd --create-home --uid 1000 app \
-    && mkdir -p /app/data /app/artifacts \
-    && chown -R app:app /app
-USER app
+# Sem USER fixo: `data/` e `artifacts/` são pastas do host montadas no contêiner, e um UID fixo
+# (ex.: 1000) não conseguiria escrever nelas num Linux cujo usuário tem outro UID. Para uma
+# imagem de produção, sem volumes do host, o certo é rodar com um usuário sem privilégios.
+RUN mkdir -p /app/data /app/artifacts

@@ -15,8 +15,7 @@ import time
 import zipfile
 from pathlib import Path
 
-import duckdb
-
+from consig_risk import duck
 from consig_risk.config import get_settings
 from consig_risk.data import sources
 from consig_risk.data.build import extract_clean
@@ -52,7 +51,7 @@ def _copy(query: str, dest: Path) -> Path:
     partial = dest.with_name(dest.name + ".tmp")
     partial.unlink(missing_ok=True)
     try:
-        duckdb.sql(f"COPY ({query}) TO '{partial}' (FORMAT parquet, COMPRESSION zstd)")
+        duck.connect().execute(f"COPY ({query}) TO '{partial}' (FORMAT parquet, COMPRESSION zstd)")
     except Exception:
         partial.unlink(missing_ok=True)
         raise
