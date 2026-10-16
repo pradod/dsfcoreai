@@ -8,12 +8,15 @@ O modelo é o exponencial por partes com LightGBM, escolhido na comparação do 
 registra as métricas de validação no artefato. O split de teste (10%) não é tocado aqui: ele é
 usado só no notebook, para reportar o resultado final.
 
-Determinístico: mesmos dados e mesma versão das bibliotecas geram o mesmo modelo.
+Determinístico: mesmos dados e mesma versão das bibliotecas geram o mesmo modelo. Se o artefato
+já foi treinado com a mesma coorte (mesmo SHA-256), o treino é pulado; `--force` treina de novo.
 Leva cerca de 2 minutos numa máquina com 4 núcleos.
 """
 
+import argparse
 import hashlib
 import importlib.metadata
+import json
 import logging
 import time
 from pathlib import Path
@@ -97,10 +100,31 @@ def train(cohort_path: Path, model_dir: Path) -> RiskModel:
     return model
 
 
-def main() -> None:
+def is_up_to_date(cohort_path: Path, model_dir: Path) -> bool:
+    """O artefato existe e foi treinado com exatamente esta coorte?"""
+    metadata_path = model_dir / "metadata.json"
+    if not (model_dir / "model.txt").exists() or not metadata_path.exists():
+        return False
+    trained_on = json.loads(metadata_path.read_text()).get("cohort_sha256")
+    return bool(trained_on == _file_sha256(cohort_path))
+
+
+def main(argv: list[str] | None = None) -> None:
+    parser = argparse.ArgumentParser(description="Treina o modelo usado pelo agent.")
+    parser.add_argument(
+        "--force", action="store_true", help="treina mesmo se já estiver atualizado"
+    )
+    args = parser.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
     settings = get_settings()
-    train(settings.data_dir / "processed" / "cohort.parquet", settings.artifacts_dir / "model")
+    cohort_path = settings.data_dir / "processed" / "cohort.parquet"
+    model_dir = settings.artifacts_dir / "model"
+    if not args.force and is_up_to_date(cohort_path, model_dir):
+        logger.info(
+            "modelo já treinado com esta coorte em %s; use --force para treinar de novo", model_dir
+        )
+        return
+    train(cohort_path, model_dir)
 
 
 if __name__ == "__main__":

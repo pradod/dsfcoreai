@@ -17,7 +17,7 @@ from consig_risk.risk.cnpj import CNPJ, parse_cnpj
 from consig_risk.risk.policy import RiskPolicy, decide_term, max_term, pct
 from consig_risk.risk.repository import CompanyRepository
 
-Status = Literal["avaliada", "nao_elegivel", "fora_do_escopo"]
+Resultado = Literal["avaliada", "nao_elegivel", "fora_do_escopo"]
 
 SITUACOES = {1: "nula", 2: "ativa", 3: "suspensa", 4: "inapta", 8: "baixada"}
 PORTES = {
@@ -127,7 +127,7 @@ class Verdict:
 
 @dataclass(frozen=True)
 class RiskReport:
-    status: Status
+    resultado: Resultado
     empresa: CompanyInfo
     politica: dict[str, Any]
     prazo_pedido_meses: int | None
@@ -176,7 +176,9 @@ class RiskAssessor:
             ),
         }
         fonte = {
-            "data_referencia_dados": snapshot.data_referencia,
+            "data_referencia_dados": dt.date.fromisoformat(snapshot.data_referencia).strftime(
+                "%d/%m/%Y"
+            ),
             "fontes": [
                 f"Receita Federal, CNPJ (foto {snapshot.foto_receita})",
                 f"Receita Federal, regimes tributários (ECF {snapshot.ano_ecf})",
@@ -189,7 +191,7 @@ class RiskAssessor:
         situacao = int(row["situacao_cadastral"])
         if situacao != 2:
             return RiskReport(
-                status="nao_elegivel",
+                resultado="nao_elegivel",
                 empresa=empresa,
                 politica=politica,
                 prazo_pedido_meses=prazo_meses,
@@ -206,7 +208,7 @@ class RiskAssessor:
             )
         if row["tem_situacao_especial"]:
             return RiskReport(
-                status="nao_elegivel",
+                resultado="nao_elegivel",
                 empresa=empresa,
                 politica=politica,
                 prazo_pedido_meses=prazo_meses,
@@ -224,7 +226,7 @@ class RiskAssessor:
         out_of_scope = _out_of_scope_reason(row)
         if out_of_scope:
             return RiskReport(
-                status="fora_do_escopo",
+                resultado="fora_do_escopo",
                 empresa=empresa,
                 politica=politica,
                 prazo_pedido_meses=prazo_meses,
@@ -251,7 +253,7 @@ class RiskAssessor:
         explain_horizon = prazo_meses or maximo or REFERENCE_HORIZON
 
         return RiskReport(
-            status="avaliada",
+            resultado="avaliada",
             empresa=empresa,
             politica=politica,
             prazo_pedido_meses=prazo_meses,

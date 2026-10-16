@@ -18,6 +18,9 @@ class Settings(BaseSettings):
     data_dir: Path = Path("data")
     artifacts_dir: Path = Path("artifacts")
     api_url: str = "http://localhost:8000"
+    # Onde o ADK guarda as conversas. SQLite basta para uma instância; para várias réplicas da
+    # API, aponte para um Postgres (ex.: postgresql+asyncpg://...).
+    session_db_url: str = "sqlite+aiosqlite:///data/sessions.db"
 
 
 class LLMSettings(BaseSettings):
