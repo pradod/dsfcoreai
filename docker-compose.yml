@@ -18,10 +18,18 @@ services:
     <<: *app
     command: ["python", "-m", "consig_risk.data"]
 
+  # Treina o modelo usado pelo agent a partir dos dados preparados (~2 min).
+  train:
+    <<: *app
+    command: ["python", "-m", "consig_risk.modeling.train"]
+    depends_on:
+      data-prep:
+        condition: service_completed_successfully
+
   api:
     <<: *app
     depends_on:
-      data-prep:
+      train:
         condition: service_completed_successfully
     command: ["uvicorn", "consig_risk.api.main:create_app", "--factory", "--host", "0.0.0.0", "--port", "8000"]
     ports:

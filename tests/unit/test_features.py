@@ -89,6 +89,10 @@ def snapshots(tmp_path: Path) -> tuple[SnapshotPaths, Path]:
             _estab("A0000004", 2, dt.date(2010, 1, 1)),  # órgão público -> fora
             _estab("A0000005", 8, dt.date(2020, 1, 1)),  # já baixada na origem -> fora
             _estab("A0000006", 2, dt.date(2012, 1, 1)),  # ativa, baixa retroativa
+            # Caso real (08314885): duas "matrizes" ativas, uma delas repetida na base.
+            {**_estab("A0000007", 2, dt.date(2020, 8, 25)), "cnpj_ordem": "0039"},
+            {**_estab("A0000007", 2, dt.date(2020, 8, 25)), "cnpj_ordem": "0039"},
+            {**_estab("A0000007", 2, dt.date(2022, 1, 29)), "cnpj_ordem": "0047"},
         ],
     )
     _write(
@@ -101,6 +105,7 @@ def snapshots(tmp_path: Path) -> tuple[SnapshotPaths, Path]:
             _empresa("A0000004", "1031"),
             _empresa("A0000005"),
             _empresa("A0000006"),
+            _empresa("A0000007"),
         ],
     )
     _write(
@@ -253,3 +258,17 @@ def test_reference_date_is_latest_registry_event(snapshots: tuple[SnapshotPaths,
     origin, _ = snapshots
 
     assert reference_date(duckdb.connect(), origin.receita_dir) == ORIGIN
+
+
+def test_company_features_keep_one_row_per_company_when_registry_has_duplicate_matriz(
+    snapshots: tuple[SnapshotPaths, Path],
+) -> None:
+    origin, _ = snapshots
+
+    rel = duckdb.sql(company_features_sql(origin))
+    rows = rel.fetchall()
+
+    ids = [r[0] for r in rows]
+    assert len(ids) == len(set(ids))
+    dup = dict(zip(rel.columns, next(r for r in rows if r[0] == "A0000007"), strict=True))
+    assert dup["cnpj_ordem"] == "0047"  # entre ativas, a de evento cadastral mais recente

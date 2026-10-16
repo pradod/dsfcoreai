@@ -7,8 +7,10 @@ Saídas:
     data/processed/cohort.parquet     coorte de treino (features na origem + desfecho)
     data/processed/companies.parquet  features de todas as empresas na foto mais recente,
                                       ordenadas por CNPJ básico (lookup rápido no serviço)
+    data/processed/companies.json     data de referência e fontes dessa foto
 """
 
+import json
 import logging
 import time
 from dataclasses import replace
@@ -56,11 +58,32 @@ def build(interim_dir: Path, processed_dir: Path, force: bool = False) -> None:
         _copy(con, cohort_sql(origin, latest_dir, latest.ref_date), cohort_path)
     companies_path = processed_dir / "companies.parquet"
     if force or not companies_path.exists():
+        # Descrições da natureza jurídica e da atividade, para o relatório ser legível.
         _copy(
             con,
-            f"SELECT * FROM ({company_features_sql(latest)}) ORDER BY cnpj_basico",
+            f"""
+            SELECT f.*, n.descricao AS natureza_descricao, c.descricao AS cnae_descricao
+            FROM ({company_features_sql(latest)}) f
+            LEFT JOIN read_parquet('{latest_dir}/Naturezas/*.parquet') n
+              ON n.codigo = f.natureza_juridica
+            LEFT JOIN read_parquet('{latest_dir}/Cnaes/*.parquet') c
+              ON c.codigo = f.cnae_fiscal_principal
+            ORDER BY f.cnpj_basico
+            """,
             companies_path,
         )
+    # Metadados da foto usada no serviço, citados no relatório do agent.
+    (processed_dir / "companies.json").write_text(
+        json.dumps(
+            {
+                "data_referencia": latest.ref_date.isoformat(),
+                "foto_receita": sources.LATEST.receita_month,
+                "trimestre_pgfn": sources.LATEST.pgfn_quarter,
+                "ano_ecf": latest.ecf_year,
+            },
+            indent=2,
+        )
+    )
 
 
 def main() -> None:

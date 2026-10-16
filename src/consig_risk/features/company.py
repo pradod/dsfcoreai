@@ -92,7 +92,17 @@ def company_features_sql(paths: SnapshotPaths) -> str:
     return f"""
     WITH
     est AS (SELECT * FROM read_parquet('{r}/Estabelecimentos/*.parquet')),
-    matriz AS (SELECT * FROM est WHERE matriz),
+    -- Uma linha por empresa. A base da Receita tem raros CNPJs com mais de um estabelecimento
+    -- marcado como matriz, às vezes repetido: fica o ativo, depois o de ordem 0001, depois o de
+    -- evento cadastral mais recente.
+    matriz AS (
+      SELECT * FROM est WHERE matriz
+      QUALIFY row_number() OVER (
+        PARTITION BY cnpj_basico
+        ORDER BY situacao_cadastral = {SITUACAO_ATIVA} DESC, cnpj_ordem = '0001' DESC,
+                 data_situacao_cadastral DESC, cnpj_ordem
+      ) = 1
+    ),
     filiais AS (
       SELECT cnpj_basico,
              count(*) FILTER (WHERE NOT matriz AND situacao_cadastral = {SITUACAO_ATIVA})

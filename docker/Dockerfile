@@ -1,8 +1,13 @@
-# Imagem única para todos os serviços (api, ui e, nas próximas etapas, data-prep e train).
+# Imagem única para todos os serviços (data-prep, train, api e ui).
 # Uma imagem só mantém as dependências idênticas entre treino e serving.
 FROM python:3.12-slim
 
 COPY --from=ghcr.io/astral-sh/uv:0.11.14 /uv /uvx /bin/
+
+# OpenMP: o LightGBM usa para treinar e prever em paralelo.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends libgomp1 \
+    && rm -rf /var/lib/apt/lists/*
 
 ENV UV_COMPILE_BYTECODE=1 \
     UV_LINK_MODE=copy \
