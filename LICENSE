@@ -1,0 +1,39 @@
+Copyright (c) 2026 Lucca Prado. Todos os direitos reservados.
+
+LICENÇA DE USO RESTRITO PARA AVALIAÇÃO
+
+Este repositório (código-fonte, notebooks, documentação, modelos e demais artefatos, doravante
+"Obra") está publicamente visível apenas para que seja avaliado como parte de um processo
+seletivo do qual o autor participa.
+
+1. Permissões. Qualquer pessoa pode visualizar, clonar e executar a Obra localmente, com o único
+   propósito de avaliar a candidatura do autor no processo seletivo.
+
+2. Restrições. Sem autorização prévia e por escrito do autor, não é permitido:
+   a) usar a Obra, no todo ou em parte, em produção, em sistemas internos, em projetos de
+      clientes ou para qualquer finalidade comercial ou operacional;
+   b) copiar, modificar, adaptar, traduzir, distribuir, publicar, sublicenciar ou vender a Obra,
+      ou criar obras derivadas dela;
+   c) incorporar trechos da Obra em outros sistemas, documentos ou modelos;
+   d) usar a Obra para treinar ou avaliar modelos de aprendizado de máquina, exceto a execução
+      local descrita no item 1.
+
+3. Ausência de outras licenças. Nenhum direito é concedido além do previsto no item 1. A
+   visibilidade pública do repositório não constitui licença de uso.
+
+4. Terceiros. As bibliotecas de terceiros usadas pela Obra seguem suas próprias licenças. Os dados
+   públicos da Receita Federal e da PGFN são baixados pelo usuário diretamente das fontes oficiais
+   e seguem os termos de uso dessas fontes; eles não fazem parte da Obra.
+
+5. Garantia. A OBRA É FORNECIDA "NO ESTADO EM QUE SE ENCONTRA", SEM GARANTIAS DE QUALQUER TIPO,
+   EXPRESSAS OU IMPLÍCITAS. EM NENHUMA HIPÓTESE O AUTOR SERÁ RESPONSÁVEL POR DANOS DECORRENTES DO
+   USO DA OBRA. As análises produzidas pela Obra não constituem recomendação de crédito.
+
+Para pedidos de autorização, entre em contato com o autor.
+
+---
+
+Summary in English: All rights reserved. You may view, clone and run this repository locally
+solely to evaluate the author's application in a hiring process. Any other use, including
+production, internal or commercial use, copying, modification, redistribution or derivative works,
+requires the author's prior written permission.
