@@ -177,3 +177,35 @@ def test_ungrounded_numbers(response: str, sources: list[Any], expected: list[st
 
 def test_numbers_from_the_analyst_message_are_grounded() -> None:
     assert ungrounded_numbers("Para 48 meses, não conceder.", [{}], ["e se fossem 48 meses?"]) == []
+
+
+class RateLimitError(Exception):
+    """Mesmo nome da exceção do LiteLLM para limite de requisições."""
+
+
+def test_provider_errors_wrapped_by_adk_are_still_recognized() -> None:
+    from consig_risk.agent.service import _friendly_error
+
+    try:
+        try:
+            raise RateLimitError("quota exceeded")
+        except RateLimitError as inner:
+            raise RuntimeError("Dynamic node analista_de_risco failed") from inner
+    except RuntimeError as wrapped:
+        message = _friendly_error(wrapped)
+
+    assert "limitando as requisições" in message
+
+
+def test_daily_quota_is_reported_differently_from_a_temporary_limit() -> None:
+    from consig_risk.agent.service import _friendly_error
+
+    try:
+        try:
+            raise RateLimitError("quotaId: GenerateRequestsPerDayPerProjectPerModel-FreeTier")
+        except RateLimitError as inner:
+            raise RuntimeError("Dynamic node analista_de_risco failed") from inner
+    except RuntimeError as wrapped:
+        message = _friendly_error(wrapped)
+
+    assert "cota diária" in message and "LLM_MODEL" in message

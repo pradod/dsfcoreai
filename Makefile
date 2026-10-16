@@ -1,4 +1,4 @@
-.PHONY: install lint format typecheck test check up down data notebooks
+.PHONY: install lint format typecheck test test-llm check up down data notebooks
 
 install:  ## Instala dependências e hooks de pre-commit
 	uv sync
@@ -16,7 +16,7 @@ typecheck:
 	uv run mypy
 
 test:
-	uv run pytest -m "not llm"
+	uv run pytest
 
 check: lint typecheck test  ## O mesmo que o CI roda
 
@@ -32,3 +32,6 @@ data:  ## Baixa e prepara os dados (idempotente; ~45 min na primeira vez)
 notebooks:  ## Reexecuta os notebooks, gravando os resultados neles
 	uv run --group notebooks jupyter nbconvert --to notebook --execute --inplace \
 		--ExecutePreprocessor.timeout=1800 notebooks/*.ipynb
+
+test-llm:  ## Avalia o agent com o LLM do .env sobre os dados reais (custa chamadas)
+	uv run pytest -m llm --no-cov

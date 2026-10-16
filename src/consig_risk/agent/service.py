@@ -129,17 +129,43 @@ def _user_messages(events: list[Event]) -> list[str]:
     return [_text(e) for e in events if e.author == "user"]
 
 
+def _exception_names(exc: BaseException) -> str:
+    """Nomes de toda a cadeia de exceções: o ADK embrulha os erros do LiteLLM nas suas próprias."""
+    names: list[str] = []
+    seen: set[int] = set()
+    current: BaseException | None = exc
+    while current is not None and id(current) not in seen:
+        seen.add(id(current))
+        names.append(type(current).__name__)
+        current = current.__cause__ or current.__context__
+    return " ".join(names)
+
+
+def _exception_text(exc: BaseException) -> str:
+    texts: list[str] = []
+    current: BaseException | None = exc
+    while current is not None and len(texts) < 10:
+        texts.append(str(current))
+        current = current.__cause__ or current.__context__
+    return " ".join(texts)
+
+
 def _friendly_error(exc: Exception) -> str:
-    name = type(exc).__name__
+    name = _exception_names(exc)
     if "Authentication" in name or "PermissionDenied" in name:
         return "O provedor de LLM recusou a chave. Confira LLM_API_KEY e LLM_MODEL no .env."
     if "RateLimit" in name:
+        if "PerDay" in _exception_text(exc):
+            return (
+                "A cota diária do provedor de LLM para este modelo acabou. Troque LLM_MODEL por "
+                "outro modelo ou aguarde a renovação da cota."
+            )
         return "O provedor de LLM está limitando as requisições. Aguarde um pouco e tente de novo."
     if "NotFound" in name or "BadRequest" in name:
         return (
             "O provedor de LLM não aceitou o pedido. Confira se LLM_MODEL é um modelo válido "
-            f"e com suporte a ferramentas ({name})."
+            f"e com suporte a ferramentas ({type(exc).__name__})."
         )
     if "Timeout" in name or "Connection" in name or "ServiceUnavailable" in name:
         return "Não foi possível falar com o provedor de LLM. Tente novamente em instantes."
-    return f"Falha ao gerar a resposta ({name}). Tente novamente."
+    return f"Falha ao gerar a resposta ({type(exc).__name__}). Tente novamente."

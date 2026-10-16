@@ -73,7 +73,8 @@ ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-ra --strict-markers --cov=consig_risk --cov-report=term-missing"
+# A avaliação com LLM real (tests/llm) só roda quando pedida: `uv run pytest -m llm`.
+addopts = "-ra --strict-markers -m 'not llm' --cov=consig_risk --cov-report=term-missing"
 markers = [
     "integration: testes que tocam disco, rede local ou artefatos treinados",
     "llm: testes que chamam um provedor de LLM real (exigem LLM_API_KEY)",

@@ -69,6 +69,7 @@ conversa.
 | Download parou no meio | Rode `docker compose up` de novo: os arquivos parciais são retomados |
 | A interface diz que o LLM não está configurado | Preencha `LLM_MODEL` e `LLM_API_KEY` e recrie os serviços: `docker compose up -d --force-recreate api ui` (o `.env` só é lido na criação do contêiner) |
 | "O provedor de LLM está limitando as requisições" ou erro 503 | Sobrecarga temporária do provedor; o sistema já tenta de novo duas vezes. Espere ou troque de modelo |
+| "A cota diária do provedor de LLM para este modelo acabou" | Contas gratuitas têm cota por dia (ex.: 20 requisições por modelo no Gemini Flash gratuito; cada mensagem faz duas). Troque `LLM_MODEL` por outro modelo ou aguarde |
 | Respostas levam minutos | Modelo de raciocínio ou endpoint lento; prefira um modelo sem raciocínio (ver acima) |
 | "O provedor de LLM não aceitou o pedido" | Nome de modelo inválido ou modelo sem suporte a ferramentas |
 
